@@ -7,6 +7,8 @@ spritesheets.hurt = love.graphics.newImage("res/SL_Knight/Hurt.png")
 spritesheets.hurtLeft = love.graphics.newImage("res/SL_Knight/HurtLeft.png")
 spritesheets.roll = love.graphics.newImage("res/SL_Knight/Roll.png")
 spritesheets.rollLeft = love.graphics.newImage("res/SL_Knight/RollLeft.png")
+spritesheets.jump = love.graphics.newImage("res/SL_Knight/Jump.png")
+spritesheets.jumpLeft = love.graphics.newImage("res/SL_Knight/JumpLeft.png")
 spritesheets.death = love.graphics.newImage("res/SL_Knight/Death.png")
 spritesheets.deathLeft = love.graphics.newImage("res/SL_Knight/DeathLeft.png")
 
@@ -20,7 +22,7 @@ knight.damage = 5
 knight.speed = 100
 knight.maxSpeed = 600
 knight.slowFactor = 45
-knight.jumpFactor = 200
+knight.jumpFactor = -200
 knight.animations = {}
 
 knight.actions = {}
@@ -58,6 +60,9 @@ function knight.createAnimationsKnight()
     table.insert(knight.animations, knight.createAnimation(spritesheets.idleLeft,32,48))
     table.insert(knight.animations,  knight.createAnimation(spritesheets.run, 40, 48))
     table.insert(knight.animations,  knight.createAnimation(spritesheets.runLeft, 40, 48))
+    table.insert(knight.animations,  knight.createAnimation(spritesheets.jump, 40, 56))
+    table.insert(knight.animations,  knight.createAnimation(spritesheets.jumpLeft, 40, 56))
+
 
 end
 
@@ -76,9 +81,9 @@ function knight.getAnimation()
         end
     elseif knight.currentAction == knight.actions.jump then
         if knight.isLookingRight then
-            return knight.animations[knight.actions.jump]
+            return knight.animations[5]
         else
-            return knight.animations[knight.actions.run + 1]
+            return knight.animations[6]
         end
     else
         return knight.animations[knight.actions.idle]
@@ -141,7 +146,6 @@ end
 function knight.jump()
     if knight.IsTouching(objects.ground.body) then
         objects.knight.body:applyLinearImpulse(0,knight.jumpFactor)
-        print("jump")
         knight.currentAction = knight.actions.jump
     end
 end
@@ -167,8 +171,8 @@ end
 
 function knight.update(dt)
     knight.input()
-    local speed = objects.knight.body:getLinearVelocity()
-    if (speed < 40 and speed > -40) then
+    local speedx, speedy = objects.knight.body:getLinearVelocity()
+    if ((speedx < 40 and speedx > -40) and (speedy > -3 and speedy < 3)  ) then
         knight.currentAction = knight.actions.idle
     end
 
