@@ -51,21 +51,25 @@ end
 
 function love.load()
 
-   local init = require 'src.game.init'
-   local ui = require 'src.game.ui'
-   local sceneManager = require 'src.game.sceneManager'
-   local start = require 'src.scenes.start'
+   require 'src.game.init'
+   require 'src.game.ui'
+   require 'src.game.sceneManager'
+   require 'src.scenes.start'
+   require 'src.actors.knight'
+
    InitGame()
    makeGround()
    makeWalls()
    makeRoof()
+
+   knight.load()
 
 end
 
 
 
 function love.update(dt)
-
+    knight.update(dt)
 end
 
 
@@ -76,6 +80,7 @@ function love.draw()
    if selectedScene == start then
    startScene()
    end
+   knight.draw()
    drawUI()
 
    drawDebug()
