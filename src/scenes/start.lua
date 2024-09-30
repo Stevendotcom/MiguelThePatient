@@ -1,6 +1,4 @@
 
-local screenWidth = love.graphics.getWidth()
-local screenHeight = love.graphics.getHeight()
 
 function startScene()
     title = love.graphics.newText(titleFont, "Miguel The Patient")

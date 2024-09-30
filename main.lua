@@ -1,5 +1,5 @@
-local screenWidth = love.graphics.getWidth()
-local screenHeight = love.graphics.getHeight()
+screenWidth = love.graphics.getWidth()
+screenHeight = love.graphics.getHeight()
 
 function drawDebug()
    for _, body in pairs(world:getBodies()) do
@@ -25,6 +25,8 @@ function makeGround()
     objects.ground.body =  love.physics.newBody(world, screenWidth/2, screenHeight - 45)
     objects.ground.shape = love.physics.newRectangleShape(screenWidth, 90)
     objects.ground.fixture = love.physics.newFixture(objects.ground.body, objects.ground.shape)
+    objects.ground.fixture:setFriction(1)
+
 end
 
 function makeWalls()
@@ -51,6 +53,8 @@ end
 
 function love.load()
 
+    love.physics.setMeter(8)
+
    require 'src.game.init'
    require 'src.game.ui'
    require 'src.game.sceneManager'
@@ -67,8 +71,28 @@ function love.load()
 end
 
 
+function love.keyreleased( key )
+
+ end
 
 function love.update(dt)
+    if love.keyboard.isDown("right") then
+        if not (objects.knight.body:getLinearVelocity() > knight.maxSpeed) then
+            objects.knight.body:applyLinearImpulse(knight.speed,0)
+        end
+    elseif love.keyboard.isDown("left") then
+        if not (objects.knight.body:getLinearVelocity() < -knight.maxSpeed) then
+            objects.knight.body:applyLinearImpulse(-knight.speed,0)
+        end
+    else
+        if objects.knight.body:getLinearVelocity() > 0 then
+            objects.knight.body:applyLinearImpulse(-knight.slowFactor,0)
+        elseif objects.knight.body:getLinearVelocity() < 0 then
+            objects.knight.body:applyLinearImpulse(knight.slowFactor,0)
+        end
+    end
+
+    world:update(dt)
     knight.update(dt)
 end
 
