@@ -71,26 +71,8 @@ function love.load()
 end
 
 
-function love.keyreleased( key )
-
- end
 
 function love.update(dt)
-    if love.keyboard.isDown("right") then
-        if not (objects.knight.body:getLinearVelocity() > knight.maxSpeed) then
-            objects.knight.body:applyLinearImpulse(knight.speed,0)
-        end
-    elseif love.keyboard.isDown("left") then
-        if not (objects.knight.body:getLinearVelocity() < -knight.maxSpeed) then
-            objects.knight.body:applyLinearImpulse(-knight.speed,0)
-        end
-    else
-        if objects.knight.body:getLinearVelocity() > 0 then
-            objects.knight.body:applyLinearImpulse(-knight.slowFactor,0)
-        elseif objects.knight.body:getLinearVelocity() < 0 then
-            objects.knight.body:applyLinearImpulse(knight.slowFactor,0)
-        end
-    end
 
     world:update(dt)
     knight.update(dt)
