@@ -122,23 +122,9 @@ function knight.makeKnightBody()
     objects.knight.body =  love.physics.newBody(world, knight.pos[1] + knight.size[1]/2, knight.pos[2]+ knight.size[2]/2, "dynamic")
     objects.knight.shape = love.physics.newRectangleShape(knight.size[1], knight.size[2])
     objects.knight.fixture = love.physics.newFixture(objects.knight.body, objects.knight.shape, 1)
-    objects.ground.fixture:setFriction(1)
+    objects.knight.fixture:setFriction(1)
 end
 
-
-
-function knight.IsTouching(other)
-    -- iterate contacts
-    local contacts = objects.knight.body:getContacts()
-    for i, contact in ipairs(contacts) do
-        -- look for a specific body
-        local f1, f2 = contact:getFixtures()
-        if f1:getBody() == other or f2:getBody() == other then
-            return true
-        end
-    end
-    return false
-end
 
 
 
