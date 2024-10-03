@@ -1,5 +1,8 @@
 screenWidth = love.graphics.getWidth()
 screenHeight = love.graphics.getHeight()
+events = {}
+events.knightAttacked = 1
+events.demonAttacked = 2
 
 function drawDebug()
    for _, body in pairs(world:getBodies()) do
@@ -51,20 +54,29 @@ function makeRoof()
 end
 
 
+
+function handleEvents(event)
+   --[[  if event == events.knightAttacked and math.abs(objects.demon.body:getX() - objects.knight.body:getX()) < knight.reach then
+            demon.receiveDamage()
+    elseif event == events.demonAttacked and math.abs(objects.demon.body:getX() - objects.knight.body:getX()) < demon.reach then
+        knight.receiveDamage()
+    end ]]
+end
+
 function love.load()
 
     love.physics.setMeter(8)
 
-   require 'src.game.init'
-   require 'src.game.ui'
-   require 'src.game.sceneManager'
-   require 'src.scenes.start'
-   require 'src.actors.knight'
+    require 'src.game.init'
+    require 'src.game.ui'
+    require 'src.game.sceneManager'
+    require 'src.scenes.start'
+    require 'src.actors.knight'
 
-   InitGame()
-   makeGround()
-   makeWalls()
-   makeRoof()
+    InitGame()
+    makeGround()
+    makeWalls()
+    makeRoof()
 
    knight.load()
 
@@ -84,11 +96,13 @@ function love.draw()
 
    love.graphics.draw(background, 0, 0, 0, screenWidth/background:getWidth(),screenHeight/background:getHeight())
    if selectedScene == start then
-   startScene()
+       startScene()
    end
+
+
    knight.draw()
    drawUI()
-
    drawDebug()
+   
 end
 
