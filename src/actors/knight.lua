@@ -122,10 +122,7 @@ function knight.makeKnightBody()
     objects.knight.body =  love.physics.newBody(world, knight.pos[1] + knight.size[1]/2, knight.pos[2]+ knight.size[2]/2, "dynamic")
     objects.knight.shape = love.physics.newRectangleShape(knight.size[1], knight.size[2])
     objects.knight.fixture = love.physics.newFixture(objects.knight.body, objects.knight.shape, 1)
-    objects.knight.fixture:setFriction(1)
 end
-
-
 
 
 --input
@@ -187,7 +184,7 @@ end
 
 
 function knight.jump()
-    if knight.IsTouching(objects.ground.body) then
+    if IsTouching(objects.knight.body, objects.ground.body) then
         objects.knight.body:applyLinearImpulse(0,knight.jumpFactor)
         knight.setAction(knight.actions.jump)
         knight.getAnimation().duration = 2
@@ -202,11 +199,11 @@ function knight.attack()
         knight.currentAction = knight.actions.attack
         if knight.isLookingRight then
             knight.correction.width = 150
-            knight.correction.centering = -80
+            knight.correction.centering = 80
             knight.getAnimation().duration = 0.4
         else
             knight.correction.width = 160
-            knight.correction.centering = -140
+            knight.correction.centering = 140
             knight.getAnimation().duration = 0.5
         end
 
@@ -216,7 +213,7 @@ end
 
 
 function knight.roll()
-    if knight.IsTouching(objects.ground.body) then
+    if IsTouching(objects.knight.body, objects.ground.body) then
 
         knight.isRolling = true
         knight.isInvencible = true
@@ -249,7 +246,7 @@ end
 
 function knight.isStoping()
     local speedX, speedY = objects.knight.body:getLinearVelocity()
-    return ((speedX < 40 and speedX > -40) and (speedY < 3 and speedY > -3 and knight.IsTouching(objects.ground.body))) and (knight.currentAction ~= knight.actions.idle) and not knight.isRolling and (knight.currentAction ~= knight.actions.attack)
+    return ((speedX < 40 and speedX > -40) and (speedY < 3 and speedY > -3 and IsTouching(objects.knight.body, objects.ground.body))) and (knight.currentAction ~= knight.actions.idle) and not knight.isRolling and (knight.currentAction ~= knight.actions.attack)
 end
 
 
@@ -267,6 +264,7 @@ end
 
 function knight.load()
     require 'src.game.animate'
+    require 'src.game.physics'
     knight.createAnimationsKnight()
     knight.makeKnightBody()
 end
@@ -301,31 +299,11 @@ end
 function knight.draw()
 
     local animation = knight.getAnimation()
-
     animation.spriteSheets:setFilter("nearest", "nearest")
-
-    local frame = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
-
-    if knight.currentAction ~= knight.actions.attack then
-        love.graphics.draw(
-            animation.spriteSheets,
-            animation.quads[frame],
-            objects.knight.body:getX() - knight.size[1]/2,
-            objects.knight.body:getY() - knight.size[2]/2,
-            0,
-            knight.size[1]/animation.frameSize[1],
-            knight.size[2]/animation.frameSize[2]
-            )
+    if knight.currentAction == knight.actions.attack then
+        drawAnimation(objects.knight.body, knight.size, animation, knight.correction.centering, knight.correction.width)
     else
-        love.graphics.draw(
-        animation.spriteSheets,
-        animation.quads[frame],
-        objects.knight.body:getX() - knight.size[1]/2 + knight.correction.centering,
-        objects.knight.body:getY() - knight.size[2]/2,
-        0,
-        (knight.size[1] + knight.correction.width)/animation.frameSize[1],
-        (knight.size[2])/animation.frameSize[2]
-        )
+        drawAnimation(objects.knight.body, knight.size, animation, 0, 0)
     end
-    --love.graphics.print(math.floor(objects.knight.body:getLinearVelocity()) , 150, 100)
+
 end
