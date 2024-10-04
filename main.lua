@@ -55,12 +55,23 @@ end
 
 
 
-function handleEvents(event)
-   --[[  if event == events.knightAttacked and math.abs(objects.demon.body:getX() - objects.knight.body:getX()) < knight.reach then
-            demon.receiveDamage()
-    elseif event == events.demonAttacked and math.abs(objects.demon.body:getX() - objects.knight.body:getX()) < demon.reach then
-        knight.receiveDamage()
-    end ]]
+function handleEvents(event, damage)
+    local distance = 0
+
+    if objects.demon.body:getX() < objects.knight.body:getX() then
+        distance = objects.knight.body:getX() - objects.demon.body:getX()
+    else
+        distance = objects.demon.body:getX() - objects.knight.body:getX()
+    end
+
+    if event == events.knightAttacked and distance < knight.reach and distance > 0 then
+        demon.receiveDamage(damage)
+    end
+
+    if event == events.demonAttacked and distance < demon.range and distance > 0 then
+        knight.recieveDam(damage)
+    end
+
 end
 
 function love.load()
@@ -71,7 +82,9 @@ function love.load()
     require 'src.game.ui'
     require 'src.game.sceneManager'
     require 'src.scenes.start'
+    require 'src.scenes.game'
     require 'src.actors.knight'
+    require 'src.actors.demon'
 
     InitGame()
     makeGround()
@@ -79,6 +92,7 @@ function love.load()
     makeRoof()
 
    knight.load()
+   demon.load()
 
 end
 
@@ -87,7 +101,11 @@ end
 function love.update(dt)
 
     world:update(dt)
-    knight.update(dt)
+    if selectedScene == scenes.start then
+        start.update()
+    elseif selectedScene == scenes.game then
+        game.update(dt)
+    end
 end
 
 
@@ -95,14 +113,14 @@ end
 function love.draw()
 
    love.graphics.draw(background, 0, 0, 0, screenWidth/background:getWidth(),screenHeight/background:getHeight())
-   if selectedScene == start then
-       startScene()
+
+   if selectedScene == scenes.start then
+       start.draw()
+   elseif selectedScene == scenes.game then
+       game.draw()
    end
 
-
-   knight.draw()
    drawUI()
-   drawDebug()
    
 end
 

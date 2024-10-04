@@ -16,15 +16,15 @@ function createAnimation(spritesheet, width, height, duration)
     return animation
 end
 
-function drawAnimation(body, size, animation, correctionCentering, correctionWidth)
+function drawAnimation(body, size, animation, correctionCenteringWidth, correctionCenteringHeight, correctionWidth, correctionHeight , orientation)
     local frame = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
     love.graphics.draw(
         animation.spriteSheets,
         animation.quads[frame],
-        body:getX() - (size[1]/2 + correctionCentering),
-        body:getY() - size[2]/2,
+        body:getX() - (size[1]/2 + correctionCenteringWidth),
+        body:getY() - (size[2]/2 + correctionCenteringHeight),
         0,
-       ( size[1] + correctionWidth)/animation.frameSize[1],
-        size[2]/animation.frameSize[2]
+       (( size[1] + correctionWidth)/animation.frameSize[1]) * orientation,
+       (size[2] + correctionHeight)/animation.frameSize[2]
         )
 end

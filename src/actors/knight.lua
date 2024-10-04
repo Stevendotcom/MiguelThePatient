@@ -26,7 +26,7 @@ knight.damage = 5
 knight.speed = 100
 knight.maxSpeed = 600
 knight.slowFactor = 45
-knight.jumpFactor = -200
+knight.jumpFactor = -400
 knight.reach = 30
 
 knight.correction = {}
@@ -44,7 +44,7 @@ knight.actions.roll = 4
 knight.actions.jump = 5
 knight.actions.death = 6
 
-knight.currentAction = {}
+knight.currentAction = knight.actions.idle
 
 --animations
 
@@ -60,11 +60,13 @@ function knight.createAnimationsKnight()
     table.insert(knight.animations, createAnimation(spritesheets.rollLeft, 32, 32))
     table.insert(knight.animations, createAnimation(spritesheets.attack, 78, 48))
     table.insert(knight.animations, createAnimation(spritesheets.attackLeft, 104, 48))
+    table.insert(knight.animations, createAnimation(spritesheets.death, 78, 48))
+    table.insert(knight.animations, createAnimation(spritesheets.deathLeft, 104, 48))
 
 end
 
 function knight.setAction(action)
-    animation = knight.getAnimation()
+    local animation = knight.getAnimation()
     animation.currentTime = 0 --needs to be called before changing animation
     knight.currentAction = action
 end
@@ -108,8 +110,16 @@ function knight.getAnimation()
         else
             return knight.animations[10]
         end
+
+    elseif knight.currentAction == knight.actions.death then
+        if knight.isLookingRight then
+            return knight.animations[11]
+        else
+            return knight.animations[12]
+        end
     else
-        return knight.animations[knight.actions.idle]
+        print("No Action with that name")
+        os.exit()
     end
 end
 
@@ -117,11 +127,14 @@ end
 
 --physics
 
-function knight.makeKnightBody()
+function knight.makeBody()
     objects.knight = {}
     objects.knight.body =  love.physics.newBody(world, knight.pos[1] + knight.size[1]/2, knight.pos[2]+ knight.size[2]/2, "dynamic")
     objects.knight.shape = love.physics.newRectangleShape(knight.size[1], knight.size[2])
     objects.knight.fixture = love.physics.newFixture(objects.knight.body, objects.knight.shape, 1)
+    objects.knight.fixture:setCategory(2)
+    objects.knight.fixture:setMask(2)
+
 end
 
 
@@ -198,6 +211,7 @@ function knight.attack()
     if not knight.isRolling and (speedX < 60 and speedX > -60)  then
         knight.currentAction = knight.actions.attack
         if knight.isLookingRight then
+            handleEvents(events.knightAttacked, knight.damage)
             knight.correction.width = 150
             knight.correction.centering = 80
             knight.getAnimation().duration = 0.4
@@ -234,12 +248,17 @@ end
 
 
 
-function knight.recieveDam()
+function knight.recieveDam(damage)
+    knight.life = knight.life - damage
+    if knight.life < 0 then
+        knight.die()
+    end
 end
 
 
 
 function knight.die()
+    knight.setAction(knight.actions.death)
 end
 
 
@@ -266,7 +285,7 @@ function knight.load()
     require 'src.game.animate'
     require 'src.game.physics'
     knight.createAnimationsKnight()
-    knight.makeKnightBody()
+    knight.makeBody()
 end
 
 
@@ -286,6 +305,8 @@ function knight.update(dt)
                 knight.endRoll()
             elseif knight.currentAction == knight.actions.attack then
                 knight.setAction(knight.actions.idle)
+            elseif knight.currentAction == knight.actions.death then
+                selectedScene = scenes.playerLost
             else
                 animation.currentTime = animation.currentTime - animation.duration
             end
@@ -301,9 +322,9 @@ function knight.draw()
     local animation = knight.getAnimation()
     animation.spriteSheets:setFilter("nearest", "nearest")
     if knight.currentAction == knight.actions.attack then
-        drawAnimation(objects.knight.body, knight.size, animation, knight.correction.centering, knight.correction.width)
+        drawAnimation(objects.knight.body, knight.size, animation, knight.correction.centering, 0, knight.correction.width, 0,1)
     else
-        drawAnimation(objects.knight.body, knight.size, animation, 0, 0)
+        drawAnimation(objects.knight.body, knight.size, animation, 0,0, 0,0, 1)
     end
 
 end
